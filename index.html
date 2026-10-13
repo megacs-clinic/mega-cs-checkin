@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="th"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-id="th-modified">MEGA CLINIC — CS WFH Check-in</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --navy:    #1B2A4A;
+    --navy2:   #243557;
+    --gold:    #C9A24B;
+    --gold2:   #E8C06A;
+    --cream:   #FAF8F4;
+    --green:   #3F7E54;
+    --green-l: #E8F5ED;
+    --orange:  #D98E3F;
+    --orange-l:#FDF0E2;
+    --red:     #C0392B;
+    --red-l:   #FDECEB;
+    --gray:    #8A95A8;
+    --border:  #DDE2EC;
+    --white:   #FFFFFF;
+    --shadow:  0 4px 24px rgba(27,42,74,0.10);
+    --shadow-lg: 0 8px 40px rgba(27,42,74,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ─── TOP BAR ─── */
+  .topbar {
+    background: var(--navy);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+  }
+  .topbar-logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .topbar-logo .gem {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .topbar-logo .brand { font-size: 15px; font-weight: 600; letter-spacing: 0.5px; }
+  .topbar-logo .sub   { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 1px; }
+  .topbar-right { font-size: 13px; color: rgba(255,255,255,0.65); }
+
+  /* ─── LAYOUT ─── */
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 28px 28px 24px;
+    margin-bottom: 16px;
+  }
+
+  /* ─── CLOCK ─── */
+  .clock-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0 16px;
+  }
+  .clock-svg-wrap {
+    position: relative;
+    width: 180px; height: 180px;
+  }
+  #clockSvg { width: 100%; height: 100%; }
+  .clock-date {
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--navy);
+    letter-spacing: 0.3px;
+  }
+  .clock-time-digital {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* ─── NAME SELECT ─── */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .name-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Sarabun', sans-serif;
+    color: var(--navy);
+    background: var(--white);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A95A8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .name-select:focus { outline: none; border-color: var(--gold); }
+
+  /* ─── STATUS PILL ─── */
+  .status-wrap { display: flex; justify-content: center; margin: 4px 0 8px; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    background: #F0F2F7;
+    color: var(--gray);
+    transition: background .3s, color .3s;
+  }
+  .status-pill .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gray);
+    transition: background .3s;
+  }
+  .status-pill.working { background: var(--green-l); color: var(--green); }
+  .status-pill.working .dot { background: var(--green); animation: pulse 1.5s infinite; }
+  .status-pill.break   { background: var(--orange-l); color: var(--orange); }
+  .status-pill.break   .dot { background: var(--orange); }
+  .status-pill.off     { background: var(--red-l); color: var(--red); }
+  .status-pill.off     .dot { background: var(--red); }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .5; transform: scale(1.3); }
+  }
+
+  /* ─── ACTION BUTTONS ─── */
+  .actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .btn-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 18px 10px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    line-height: 1.3;
+  }
+  .btn-action .icon { font-size: 22px; }
+  .btn-action:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+  .btn-in    { background: var(--green-l);   color: var(--green);  border-color: #C2E0CE; }
+  .btn-break { background: var(--orange-l);  color: var(--orange); border-color: #F5DABD; }
+  .btn-back  { background: #EEF4FF;          color: #3D6EC9;       border-color: #C5D7F5; }
+  .btn-out   { background: var(--red-l);     color: var(--red);    border-color: #F5C8C5; }
+  .btn-in:not(:disabled):hover    { background: #C2E0CE; }
+  .btn-break:not(:disabled):hover { background: #F5DABD; }
+  .btn-back:not(:disabled):hover  { background: #C5D7F5; }
+  .btn-out:not(:disabled):hover   { background: #F5C8C5; }
+
+  /* ─── CAMERA MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10,18,35,0.65);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 20px;
+    width: 100%; max-width: 420px;
+    padding: 24px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+  }
+  .modal-title {
+    font-size: 17px; font-weight: 700;
+    color: var(--navy); margin-bottom: 4px;
+  }
+  .modal-sub {
+    font-size: 13px; color: var(--gray); margin-bottom: 16px;
+  }
+
+  /* source tabs */
+  .source-tabs {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .tab-btn {
+    flex: 1; padding: 8px 6px;
+    border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--gray);
+    font-size: 12px; font-family: 'Sarabun', sans-serif;
+    font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: all .15s;
+  }
+  .tab-btn.active {
+    border-color: var(--gold); background: #FDF7EC; color: var(--navy);
+  }
+
+  /* preview area */
+  .preview-area {
+    position: relative;
+    width: 100%; aspect-ratio: 4/3;
+    background: #0D1524;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #videoEl {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+  #photoCanvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+  .preview-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    color: rgba(255,255,255,0.4); font-size: 13px; text-align: center;
+  }
+  .preview-placeholder .big-icon { font-size: 40px; }
+  .source-tag {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff; font-size: 11px;
+    padding: 3px 8px; border-radius: 6px;
+    display: none;
+  }
+
+  /* modal buttons row */
+  .modal-btns {
+    display: flex; gap: 8px; margin-top: 14px;
+  }
+  .btn-secondary {
+    flex: 1; padding: 12px;
+    border-radius: 12px; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--navy);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-secondary:hover { background: var(--cream); }
+  .btn-primary {
+    flex: 2; padding: 12px;
+    border-radius: 12px; border: none;
+    background: var(--navy); color: var(--white);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: background .15s, opacity .15s;
+  }
+  .btn-primary:hover   { background: var(--navy2); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-shoot {
+    width: 100%; margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px; border: 1.5px solid var(--border);
+    background: var(--cream); color: var(--navy);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-shoot:hover { background: var(--border); }
+
+  /* file upload zone */
+  .upload-zone {
+    width: 100%; aspect-ratio: 4/3;
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    background: var(--cream);
+  }
+  .upload-zone:hover { border-color: var(--gold); background: #FDF7EC; }
+  .upload-zone .big-icon { font-size: 40px; }
+  .upload-zone p { font-size: 13px; color: var(--gray); text-align: center; }
+  #fileInput { display: none; }
+
+  /* ─── HISTORY ─── */
+  .history-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .history-title { font-size: 15px; font-weight: 700; }
+  .history-badge {
+    background: var(--navy); color: var(--white);
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+  }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-empty {
+    text-align: center; color: var(--gray);
+    font-size: 13px; padding: 16px 0;
+  }
+  .history-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--cream);
+  }
+  .h-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .h-info { flex: 1; }
+  .h-name { font-size: 13px; font-weight: 600; }
+  .h-action { font-size: 12px; color: var(--gray); }
+  .h-time { font-size: 12px; color: var(--gray); font-weight: 600; flex-shrink: 0; }
+  .h-photo {
+    width: 40px; height: 40px; border-radius: 8px;
+    object-fit: cover; flex-shrink: 0;
+    border: 1.5px solid var(--border);
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--navy); color: var(--white);
+    padding: 12px 22px; border-radius: 100px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s, bottom .3s;
+    white-space: nowrap; z-index: 200;
+  }
+  .toast.show { opacity: 1; bottom: 32px; }
+  .toast.success { background: var(--green); }
+  .toast.error   { background: var(--red); }
+
+  /* ─── DIVIDER ─── */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+<meta property="og:title" content="MEGA CLINIC — CS WFH Check-in" data-id="th-modified"><meta property="og:image:width" content="1501" data-id="th-modified"><meta property="og:image:height" content="1501" data-id="th-modified"><meta property="og:image:type" content="image/png" data-id="th-modified"><meta property="og:type" content="website" data-id="th-modified"><style id="claude-agent-animation-styles">
+      @keyframes claude-pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+      #claude-agent-glow-border-inner {
+        animation: claude-pulse 2s ease-in-out infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #claude-agent-glow-border-inner {
+          animation: none;
+        }
+      }
+    </style></head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="gem">💎</div>
+    <div>
+      <div class="brand">MEGA CLINIC</div>
+      <div class="sub">CS WFH Check-in System</div>
+    </div>
+  </div>
+  <div class="topbar-right" id="topbarDate">30 มิ.ย. 2569</div>
+</div>
+
+<div class="container">
+
+  <!-- CLOCK CARD -->
+  <div class="card">
+    <div class="clock-wrap">
+      <div class="clock-svg-wrap">
+        <svg id="clockSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- face -->
+          <circle cx="100" cy="100" r="96" fill="#1B2A4A"></circle>
+          <circle cx="100" cy="100" r="88" fill="#243557"></circle>
+          <!-- gold ring -->
+          <circle cx="100" cy="100" r="90" fill="none" stroke="#C9A24B" stroke-width="2.5" opacity="0.7"></circle>
+          <!-- hour markers -->
+          <g id="hourMarkers"><line x1="100" y1="20" x2="100" y2="30" stroke="#C9A24B" stroke-width="2.5" stroke-linecap="round"></line><line x1="140" y1="30.7179676972449" x2="137.5" y2="35.0480947161671" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="169.28203230275508" y1="60" x2="164.9519052838329" y2="62.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="180" y1="100" x2="170" y2="100" stroke="#C9A24B" stroke-width="2.5" stroke-linecap="round"></line><line x1="169.2820323027551" y1="140" x2="164.9519052838329" y2="137.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="140" y1="169.2820323027551" x2="137.5" y2="164.9519052838329" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="100" y1="180" x2="100" y2="170" stroke="#C9A24B" stroke-width="2.5" stroke-linecap="round"></line><line x1="59.999999999999986" y1="169.28203230275508" x2="62.499999999999986" y2="164.9519052838329" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="30.717967697244916" y1="140.00000000000003" x2="35.048094716167114" y2="137.50000000000003" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="20" y1="100.00000000000001" x2="30" y2="100.00000000000001" stroke="#C9A24B" stroke-width="2.5" stroke-linecap="round"></line><line x1="30.717967697244916" y1="59.99999999999999" x2="35.0480947161671" y2="62.49999999999999" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line><line x1="59.999999999999964" y1="30.71796769724493" x2="62.499999999999964" y2="35.04809471616713" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"></line></g>
+          <!-- hands -->
+          <line id="hourHand" x1="90.4459270184006" y1="102.95291203090652" x2="145.8595503116771" y2="85.82602225164874" stroke="#C9A24B" stroke-width="4" stroke-linecap="round"></line>
+          <line id="minHand" x1="95.60060830144084" y1="91.01972424239385" x2="127.27622853106676" y2="155.67770969715815" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"></line>
+          <line id="secHand" x1="110.2434824274756" y1="93.74931461694011" x2="41.953599577638265" y2="135.42055050400606" stroke="#E8C06A" stroke-width="1.5" stroke-linecap="round"></line>
+          <!-- center dot -->
+          <circle cx="100" cy="100" r="5" fill="#C9A24B"></circle>
+          <circle cx="100" cy="100" r="2.5" fill="#1B2A4A"></circle>
+        </svg>
+      </div>
+      <div class="clock-time-digital" id="digitalTime">14:25:39</div>
+      <div class="clock-date" id="clockDate">วันอังคารที่ 30 มิ.ย. 2569</div>
+    </div>
+  </div>
+
+  <!-- SELECT + STATUS CARD -->
+  <div class="card">
+    <div class="section-label">เลือกชื่อของคุณ</div>
+    <select class="name-select" id="nameSelect">
+      <option value="">— กรุณาเลือกชื่อ —</option>
+      <option value="ปูเป้">ปูเป้ — ณัฐธิดา</option>
+      <option value="ไนซ์">ไนซ์ — ณัฐนิชา</option>
+      <option value="มะมาย">มะมาย — ศิริลักษณ์</option>
+      <option value="แพรว">แพรว — ธนวรรณ</option>
+      <option value="แคร์">แคร์ — สุภัสรา</option>
+      <option value="แต้ว">แต้ว — วลัยภรณ์</option>
+      <option value="ตุ๊ดตู่">ตุ๊ดตู่ — สุดใจ</option>
+      <option value="นกยูง">นกยูง — นกยูง</option>
+    </select>
+
+    <div class="divider"></div>
+
+    <div class="status-wrap">
+      <div class="status-pill" id="statusPill">
+        <div class="dot"></div>
+        <span id="statusText">ยังไม่ได้เลือกชื่อ</span>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="actions-grid">
+      <button class="btn-action btn-in" id="btnIn" disabled="">
+        <span class="icon">🟢</span>เข้างาน WFH
+      </button>
+      <button class="btn-action btn-break" id="btnBreak" disabled="">
+        <span class="icon">☕</span>พักกลางวัน
+      </button>
+      <button class="btn-action btn-back" id="btnBack" disabled="">
+        <span class="icon">🔄</span>กลับจากพัก
+      </button>
+      <button class="btn-action btn-out" id="btnOut" disabled="">
+        <span class="icon">🔴</span>เลิกงาน
+      </button>
+    </div>
+  </div>
+
+  <!-- HISTORY CARD -->
+  <div class="card">
+    <div class="history-header">
+      <span class="history-title">📋 ประวัติวันนี้</span>
+      <span class="history-badge" id="historyBadge">0</span>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">ยังไม่มีรายการ</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ─── CAMERA / SOURCE MODAL ─── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">ยืนยันตัวตน</div>
+    <div class="modal-sub" id="modalSub">เลือกวิธีถ่ายรูปยืนยัน</div>
+
+    <!-- tabs -->
+    <div class="source-tabs">
+      <button class="tab-btn active" id="tabCamera" onclick="switchTab('camera')">
+        📷 กล้อง
+      </button>
+      <button class="tab-btn" id="tabScreen" onclick="switchTab('screen')">
+        🖥️ แคปหน้าจอ
+      </button>
+      <button class="tab-btn" id="tabUpload" onclick="switchTab('upload')">
+        📁 อัปโหลด
+      </button>
+    </div>
+
+    <!-- camera/screen panel -->
+    <div id="panelMedia">
+      <div class="preview-area" id="previewArea">
+        <video id="videoEl" autoplay="" playsinline=""></video>
+        <canvas id="photoCanvas"></canvas>
+        <div class="preview-placeholder" id="previewPlaceholder">
+          <div class="big-icon">📷</div>
+          <div>กดปุ่มด้านล่างเพื่อเปิดกล้อง</div>
+        </div>
+        <div class="source-tag" id="sourceTag"></div>
+      </div>
+      <button class="btn-shoot" id="btnShootAction" onclick="handleShootAction()">
+        📷 เปิดกล้อง
+      </button>
+    </div>
+
+    <!-- upload panel -->
+    <div id="panelUpload" style="display:none">
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="big-icon">📁</div>
+        <p>คลิกเพื่อเลือกรูปภาพ<br><span style="font-size:11px;color:#B0B8C8">PNG, JPG, GIF สูงสุด 10MB</span></p>
+      </div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="cancelModal()">ยกเลิก</button>
+      <button class="btn-primary" id="btnConfirm" onclick="confirmCheckin()" disabled>
+        ✅ ยืนยันส่ง
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ──────────────────────────────────────────────
+//  CONFIG
+// ──────────────────────────────────────────────
+// Power Automate / Teams Workflow ที่รับข้อมูลเช็คอิน
+// (Workflow นี้จะบันทึกรูปลง SharePoint + เพิ่มแถวใน Excel + โพสต์ใน Teams)
+const WEBHOOK_URL   = 'https://default6e3bad2b0568436188590d6886bcd4.60.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/22/workflows/e0dd6c24985d46c5bdaac1c69b83786c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Hk11t3Y5rusbWxjU7o5W8lScHVNretMnnyxJuodzgUU';   // Workflow ของบัญชีกลาง megacs@
+const PHOTO_MAX_SIDE = 1280;   // ย่อรูปด้านยาวสุดไม่เกินนี้ (px)
+const PHOTO_QUALITY  = 0.7;    // คุณภาพ JPEG (0–1)
+
+// ย่อ + บีบอัดรูป แล้วคืนค่าเป็น base64 (ไม่มี prefix data:) สำหรับส่งให้ Workflow
+function compressPhoto(dataUrl) {
+  return new Promise((resolve) => {
+    if (!dataUrl) return resolve(null);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', PHOTO_QUALITY).split(',')[1]);
+    };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+
+function photoFileName(name, action) {
+  const n = new Date(), p = (x) => String(x).padStart(2, '0');
+  const ts = `${n.getFullYear()}${p(n.getMonth()+1)}${p(n.getDate())}_${p(n.getHours())}${p(n.getMinutes())}${p(n.getSeconds())}`;
+  return `checkin_${action}_${ts}_${Math.floor(Math.random()*9999)}.jpg`;
+}
+
+// ──────────────────────────────────────────────
+//  STATE
+// ──────────────────────────────────────────────
+// status per person: 'idle' | 'in' | 'break' | 'out'
+const personStatus = {};
+let pendingAction   = null;   // { action, label }
+let capturedImage   = null;   // base64 data URL
+let currentTab      = 'camera';
+let mediaStream     = null;
+let photoTaken      = false;
+let history       = [];
+
+const ACTION_META = {
+  in:    { label: 'เข้างาน WFH',   color: '#3F7E54', dot: 'working' },
+  break: { label: 'พักกลางวัน',    color: '#D98E3F', dot: 'break'   },
+  back:  { label: 'กลับจากพัก',    color: '#3D6EC9', dot: 'working' },
+  out:   { label: 'เลิกงาน',       color: '#C0392B', dot: 'off'     },
+};
+
+// ──────────────────────────────────────────────
+//  CLOCK
+// ──────────────────────────────────────────────
+function drawHourMarkers() {
+  const g = document.getElementById('hourMarkers');
+  for (let i = 0; i < 12; i++) {
+    const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
+    const r1 = 80, r2 = i % 3 === 0 ? 70 : 75;
+    const x1 = 100 + r1 * Math.cos(angle);
+    const y1 = 100 + r1 * Math.sin(angle);
+    const x2 = 100 + r2 * Math.cos(angle);
+    const y2 = 100 + r2 * Math.sin(angle);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', i % 3 === 0 ? '#C9A24B' : 'rgba(255,255,255,0.3)');
+    line.setAttribute('stroke-width', i % 3 === 0 ? '2.5' : '1.5');
+    line.setAttribute('stroke-linecap', 'round');
+    g.appendChild(line);
+  }
+}
+
+function rotateLine(el, cx, cy, angle, len, offset = 0) {
+  const rad = (angle - 90) * Math.PI / 180;
+  const x2 = cx + len * Math.cos(rad);
+  const y2 = cy + len * Math.sin(rad);
+  const xo = cx - offset * Math.cos(rad);
+  const yo = cy - offset * Math.sin(rad);
+  el.setAttribute('x1', xo); el.setAttribute('y1', yo);
+  el.setAttribute('x2', x2); el.setAttribute('y2', y2);
+}
+
+const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const THAI_DAYS   = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+
+function tickClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds(), ms = now.getMilliseconds();
+  const hDeg = ((h % 12) + m / 60 + s / 3600) * 30;
+  const mDeg = (m + s / 60) * 6;
+  const sDeg = (s + ms / 1000) * 6;
+  rotateLine(document.getElementById('hourHand'), 100, 100, hDeg, 48, 10);
+  rotateLine(document.getElementById('minHand'),  100, 100, mDeg, 62, 10);
+  rotateLine(document.getElementById('secHand'),  100, 100, sDeg, 68, 12);
+
+  document.getElementById('digitalTime').textContent =
+    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  const day = THAI_DAYS[now.getDay()];
+  const date = now.getDate();
+  const month = THAI_MONTHS[now.getMonth()];
+  const year = now.getFullYear() + 543;
+  document.getElementById('clockDate').textContent  = `วัน${day}ที่ ${date} ${month} ${year}`;
+  document.getElementById('topbarDate').textContent = `${date} ${month} ${year}`;
+}
+drawHourMarkers();
+tickClock();
+setInterval(tickClock, 200);
+
+// ──────────────────────────────────────────────
+//  STATUS & BUTTONS
+// ──────────────────────────────────────────────
+function getStatus(name) { return personStatus[name] || 'idle'; }
+
+function updateUI(name) {
+  const status = getStatus(name);
+  const pill   = document.getElementById('statusPill');
+  const txt    = document.getElementById('statusText');
+
+  pill.className = 'status-pill';
+  if (status === 'in' || status === 'back') {
+    pill.classList.add('working');
+    txt.textContent = `${name} — กำลังทำงาน WFH`;
+  } else if (status === 'break') {
+    pill.classList.add('break');
+    txt.textContent = `${name} — กำลังพักอยู่`;
+  } else if (status === 'out') {
+    pill.classList.add('off');
+    txt.textContent = `${name} — เลิกงานแล้ว`;
+  } else {
+    txt.textContent = `${name} — ยังไม่ได้เช็คอิน`;
+  }
+
+  // all buttons enabled when name is selected
+  ['btnIn','btnBreak','btnBack','btnOut'].forEach(id => document.getElementById(id).disabled = false);
+}
+
+document.getElementById('nameSelect').addEventListener('change', function() {
+  const name = this.value;
+  if (!name) {
+    document.getElementById('statusPill').className = 'status-pill';
+    document.getElementById('statusText').textContent = 'ยังไม่ได้เลือกชื่อ';
+    ['btnIn','btnBreak','btnBack','btnOut'].forEach(id => document.getElementById(id).disabled = true);
+    return;
+  }
+  updateUI(name);
+});
+
+['in','break','back','out'].forEach(action => {
+  document.getElementById(`btn${action.charAt(0).toUpperCase()+action.slice(1)}`).addEventListener('click', () => {
+    const name = document.getElementById('nameSelect').value;
+    if (!name) return;
+    pendingAction = { action, label: ACTION_META[action].label };
+    openModal(name, action);
+  });
+});
+
+// ──────────────────────────────────────────────
+//  MODAL OPEN / CLOSE
+// ──────────────────────────────────────────────
+const emojiMap = { in:'🟢', break:'☕', back:'🔄', out:'🔴' };
+
+function openModal(name, action) {
+  capturedImage = null; photoTaken = false;
+  document.getElementById('btnConfirm').disabled = true;
+  document.getElementById('modalTitle').textContent = `${emojiMap[action]} ${ACTION_META[action].label}`;
+  document.getElementById('modalSub').textContent   = `${name} — ถ่ายรูปยืนยัน แล้วกดส่ง`;
+  resetPreview();
+  switchTab('camera');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function cancelModal() {
+  stopStream();
+  document.getElementById('modalOverlay').classList.remove('open');
+  pendingAction = null;
+}
+
+// ──────────────────────────────────────────────
+//  TAB SWITCHING
+// ──────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  stopStream();
+  resetPreview();
+  capturedImage = null; photoTaken = false;
+
+  ['camera','screen','upload'].forEach(t => {
+    document.getElementById(`tab${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active', t === tab);
+  });
+
+  const isUpload = tab === 'upload';
+  document.getElementById('panelMedia').style.display  = isUpload ? 'none' : '';
+  document.getElementById('panelUpload').style.display = isUpload ? '' : 'none';
+
+  if (tab === 'camera') {
+    document.getElementById('btnShootAction').textContent = '📷 เปิดกล้อง';
+    document.getElementById('previewPlaceholder').innerHTML = '<div class="big-icon">📷</div><div>กดปุ่มด้านล่างเพื่อเปิดกล้อง</div>';
+    showPlaceholder(true);
+  } else if (tab === 'screen') {
+    document.getElementById('btnShootAction').textContent = '🖥️ เลือกหน้าจอเพื่อแคป';
+    document.getElementById('previewPlaceholder').innerHTML = '<div class="big-icon">🖥️</div><div>กดปุ่มด้านล่างเพื่อแชร์หน้าจอ</div>';
+    showPlaceholder(true);
+  }
+}
+
+// ──────────────────────────────────────────────
+//  MEDIA (camera / screen)
+// ──────────────────────────────────────────────
+function showPlaceholder(show) {
+  document.getElementById('previewPlaceholder').style.display = show ? 'flex' : 'none';
+}
+
+async function handleShootAction() {
+  const video = document.getElementById('videoEl');
+  const canvas = document.getElementById('photoCanvas');
+  const btn = document.getElementById('btnShootAction');
+
+  if (photoTaken) {
+    // retake
+    photoTaken = false; capturedImage = null;
+    canvas.style.display = 'none';
+    document.getElementById('sourceTag').style.display = 'none';
+    if (currentTab === 'camera') {
+      await startCamera(); return;
+    } else {
+      showPlaceholder(true);
+      btn.textContent = '🖥️ เลือกหน้าจอเพื่อแคป'; return;
+    }
+  }
+
+  if (currentTab === 'camera') {
+    if (mediaStream) {
+      takePhoto('📷 กล้องสด');
+    } else {
+      await startCamera();
+    }
+  } else {
+    if (mediaStream) {
+        takePhoto('🖥️ หน้าจอ');
+      } else {
+        await startScreen();
+      }
+  }
+}
+
+async function startCamera() {
+  const btn = document.getElementById('btnShootAction');
+  try {
+    stopStream();
+    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    const video = document.getElementById('videoEl');
+    video.srcObject = mediaStream;
+    video.style.display = 'block';
+    showPlaceholder(false);
+    btn.textContent = '📸 ถ่ายรูป';
+  } catch(e) {
+    showToast('❌ ไม่สามารถเปิดกล้องได้ — ลองอัปโหลดรูปแทน', 'error');
+  }
+}
+
+async function startScreen() {
+  const btn = document.getElementById('btnShootAction');
+  try {
+    stopStream();
+    mediaStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    const video = document.getElementById('videoEl');
+    video.srcObject = mediaStream;
+    video.style.display = 'block';
+    showPlaceholder(false);
+    btn.textContent = '📸 แคปหน้าจอตอนนี้';
+    mediaStream.getVideoTracks()[0].addEventListener('ended', () => {
+      if (!photoTaken) {
+        stopStream();
+        showPlaceholder(true);
+        btn.textContent = '🖥️ เลือกหน้าจอเพื่อแคป';
+      }
+    });
+  } catch(e) {
+    showToast('ยกเลิกการแชร์หน้าจอ', 'error');
+  }
+}
+
+function takePhoto(tagLabel) {
+  const video  = document.getElementById('videoEl');
+  const canvas = document.getElementById('photoCanvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  capturedImage = canvas.toDataURL('image/jpeg', 0.75);
+  canvas.style.display = 'block';
+  video.style.display  = 'none';
+  const tag = document.getElementById('sourceTag');
+  tag.textContent = tagLabel; tag.style.display = 'block';
+  stopStream();
+  photoTaken = true;
+  document.getElementById('btnShootAction').textContent = '🔄 ถ่ายใหม่';
+  document.getElementById('btnConfirm').disabled = false;
+}
+
+function stopStream() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop());
+    mediaStream = null;
+  }
+  const video = document.getElementById('videoEl');
+  video.srcObject = null; video.style.display = 'none';
+}
+
+function resetPreview() {
+  stopStream();
+  const canvas = document.getElementById('photoCanvas');
+  canvas.style.display = 'none';
+  document.getElementById('sourceTag').style.display = 'none';
+  showPlaceholder(true);
+  // reset upload zone
+  document.getElementById('fileInput').value = '';
+  const uz = document.getElementById('uploadZone');
+  uz.innerHTML = '<div class="big-icon">📁</div><p>คลิกเพื่อเลือกรูปภาพ<br><span style="font-size:11px;color:#B0B8C8">PNG, JPG, GIF สูงสุด 10MB</span></p>';
+}
+
+// File upload
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    capturedImage = ev.target.result;
+    const uz = document.getElementById('uploadZone');
+    uz.innerHTML = `<img src="${capturedImage}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;"><div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;">📁 จากไฟล์</div>`;
+    uz.style.position = 'relative';
+    document.getElementById('btnConfirm').disabled = false;
+  };
+  reader.readAsDataURL(file);
+});
+
+// ──────────────────────────────────────────────
+//  CONFIRM & SEND
+// ──────────────────────────────────────────────
+async function confirmCheckin() {
+  const btn = document.getElementById('btnConfirm');
+  btn.disabled = true;
+  btn.textContent = '⏳ กำลังส่ง...';
+  const name   = document.getElementById('nameSelect').value;
+  const action = pendingAction.action;
+  const label  = pendingAction.label;
+
+    // build Thai time/date
+  const now   = new Date();
+  const time  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const date  = `${now.getDate()} ${THAI_MONTHS[now.getMonth()]} ${now.getFullYear()+543}`;
+
+  // แนบรูปไปกับข้อมูลเลย — Workflow จะเซฟลง SharePoint ให้
+  const payload = { name, action, actionLabel: label, time, date };
+  const imageBase64 = await compressPhoto(capturedImage);
+  if (imageBase64) {
+    payload.imageBase64 = imageBase64;
+    payload.fileName = photoFileName(name, action);
+  }
+
+  // close modal immediately for snappy UX
+  stopStream();
+  document.getElementById('modalOverlay').classList.remove('open');
+
+  // send webhook
+  if (WEBHOOK_URL !== 'PASTE_YOUR_POWER_AUTOMATE_URL_HERE') {
+    try {
+      const resp = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      showToast(`✅ ส่งเข้า Teams แล้ว — ${label}`, 'success');
+    } catch(e) {
+      showToast(`⚠️ Teams error: ${e.message}`, 'error');
+    }
+  } else {
+    showToast(`✅ บันทึกแล้ว — ${label} (ยังไม่มี webhook)`, 'success');
+  }
+
+  // update state
+  const newStatus = { in:'in', break:'break', back:'back', out:'out' }[action];
+  personStatus[name] = newStatus;
+  updateUI(name);
+
+  // add to history
+  addHistory({ name, action, label, time, date, image: capturedImage });
+  pendingAction = null;
+}
+
+// ──────────────────────────────────────────────
+//  HISTORY
+// ──────────────────────────────────────────────
+function addHistory(entry) {
+  history.unshift(entry);
+  document.getElementById('historyBadge').textContent = history.length;
+  const list = document.getElementById('historyList');
+  if (history.length === 1) list.innerHTML = '';
+
+  const meta = ACTION_META[entry.action];
+  const item = document.createElement('div');
+  item.className = 'history-item';
+  item.innerHTML = `
+    <div class="h-dot" style="background:${meta.color}"></div>
+    <div class="h-info">
+      <div class="h-name">${entry.name}</div>
+      <div class="h-action">${entry.label}</div>
+    </div>
+    <div class="h-time">${entry.time} น.</div>
+    ${entry.image ? `<img class="h-photo" src="${entry.image}" alt="รูปยืนยัน">` : ''}
+  `;
+  list.prepend(item);
+  saveHistory();
+}
+
+// ──────────────────────────────────────────────
+//  TOAST
+// ──────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function todayKey() {
+  const d = new Date();
+  if (d.getHours() < 5) d.setDate(d.getDate() - 1); // ก่อนตี 5 นับเป็นวันก่อน
+  return 'checkin_' + d.getFullYear() + '_' + d.getMonth() + '_' + d.getDate();
+}
+function saveHistory() {
+  try {
+    const slim = history.map(e => ({ name: e.name, action: e.action, label: e.label, time: e.time }));
+    localStorage.setItem(todayKey(), JSON.stringify(slim));
+  } catch(e) {}
+}
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem(todayKey());
+    if (!saved) return;
+    const entries = JSON.parse(saved);
+    entries.reverse().forEach(entry => {
+      history.push(entry);
+      const badge = document.getElementById('historyBadge');
+      if (badge) badge.textContent = history.length;
+      const list = document.getElementById('historyList');
+      if (!list) return;
+      if (history.length === 1) list.innerHTML = '';
+      const meta = ACTION_META[entry.action] || { color: '#999', icon: '?', label: entry.action };
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `<div class="h-dot" style="background:${meta.color}"></div><div class="h-info"><span class="h-name">${entry.name}</span><span class="h-action" style="color:${meta.color}">${entry.label}</span></div><div class="h-time">${entry.time}</div>`;
+      list.appendChild(item);
+    });
+  } catch(e) {}
+}
+loadHistory();
+</script>
+</body>
+</html>
